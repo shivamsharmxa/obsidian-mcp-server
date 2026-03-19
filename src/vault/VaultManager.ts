@@ -48,7 +48,8 @@ export class VaultManager {
    */
   resolvePath(notePath: string): string {
     const abs = path.resolve(this.vaultRoot, notePath);
-    if (!abs.startsWith(this.vaultRoot + path.sep) && abs !== this.vaultRoot) {
+    const rel = path.relative(this.vaultRoot, abs);
+    if (rel.startsWith('..') || path.isAbsolute(rel)) {
       throw new VaultSecurityError(notePath);
     }
     return abs;
@@ -557,12 +558,27 @@ export class VaultManager {
   }
 
   /**
-   * Assert a file exists, throwing NoteNotFoundError if not.
+   * Assert a file exists and its real path (after symlink resolution) is
+   * still inside the vault. Throws NoteNotFoundError or VaultSecurityError.
    */
   private async assertExists(absPath: string, displayPath: string): Promise<void> {
     try {
       await fs.access(absPath);
     } catch {
+      throw new NoteNotFoundError(displayPath);
+    }
+    // Resolve symlinks and re-check vault boundary (both sides must be resolved)
+    try {
+      const [realPath, realVaultRoot] = await Promise.all([
+        fs.realpath(absPath),
+        fs.realpath(this.vaultRoot),
+      ]);
+      const rel = path.relative(realVaultRoot, realPath);
+      if (rel.startsWith('..') || path.isAbsolute(rel)) {
+        throw new VaultSecurityError(displayPath);
+      }
+    } catch (err) {
+      if (err instanceof VaultSecurityError) throw err;
       throw new NoteNotFoundError(displayPath);
     }
   }

@@ -19,6 +19,7 @@ export const appendNoteSchema = z.object({
   content: z
     .string()
     .min(1)
+    .max(10_000_000, 'Content exceeds 10MB limit.')
     .describe('Markdown content to append.'),
   section: z
     .string()

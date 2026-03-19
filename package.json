@@ -4,6 +4,7 @@
   "description": "A local MCP server that exposes your Obsidian vault as structured tools for Claude.ai",
   "type": "module",
   "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "bin": {
     "obsidian-mcp": "dist/index.js"
   },
@@ -45,6 +46,6 @@
     "notes",
     "markdown"
   ],
-  "author": "",
+  "author": "Shivam Sharma <shivamsharmxa@github.com>",
   "license": "MIT"
 }

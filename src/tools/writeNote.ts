@@ -22,6 +22,7 @@ export const writeNoteSchema = z.object({
     ),
   content: z
     .string()
+    .max(10_000_000, 'Content exceeds 10MB limit.')
     .describe(
       'Markdown body content (do NOT include frontmatter YAML here; ' +
         'use the frontmatter field instead).',
