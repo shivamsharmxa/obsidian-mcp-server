@@ -1,4 +1,3 @@
-#!/usr/bin/env node
 /**
  * Obsidian MCP Server — entry point.
  *
